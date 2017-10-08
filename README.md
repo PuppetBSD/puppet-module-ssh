@@ -31,6 +31,9 @@ ruby versions.
  * EL 5
  * EL 6
  * EL 7
+ * FreeBSD 10
+ * FreeBSD 11
+ * FreeBSD 12
  * SLES 10
  * SLES 11
  * SLES 12

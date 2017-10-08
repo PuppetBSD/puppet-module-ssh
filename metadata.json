@@ -37,6 +37,14 @@
       ]
     },
     {
+      "operatingsystem": "FreeBSD",
+      "operatingsystemrelease": [
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    {
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
         "5",

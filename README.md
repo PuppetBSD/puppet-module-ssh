@@ -47,6 +47,8 @@ for the exact matrix of supported Puppet and ruby versions.
  * Solaris 9
  * Solaris 10
  * Solaris 11
+ * FreeBSD 11
+ * FreeBSD 12
 
 If you use the Sun Solaris SSH, please keep in mind that not all parameters can be used.
 

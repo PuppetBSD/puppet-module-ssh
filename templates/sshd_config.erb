@@ -98,6 +98,9 @@ IgnoreUserKnownHosts <%= @sshd_ignoreuserknownhosts %>
 #IgnoreRhosts yes
 IgnoreRhosts <%= @sshd_ignorerhosts %>
 
+<%- if @sshd_config_authenticationmethods -%>
+AuthenticationMethods <%= @sshd_config_authenticationmethods.join(',') %>
+<%- end -%>
 # To disable tunneled clear text passwords, change to no here!
 #PasswordAuthentication yes
 PasswordAuthentication <%= @sshd_password_authentication %>
@@ -219,6 +222,10 @@ ChrootDirectory <%= @sshd_config_chrootdirectory %>
 <% end -%>
 <% if @sshd_config_forcecommand -%>
 ForceCommand <%= @sshd_config_forcecommand %>
+<% end -%>
+<% if @sshd_config_allowagentforwarding != nil -%>
+#AllowAgentForwarding yes
+AllowAgentForwarding <%= @sshd_config_allowagentforwarding %>
 <% end -%>
 
 # no default banner path

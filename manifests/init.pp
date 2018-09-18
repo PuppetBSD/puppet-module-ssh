@@ -93,6 +93,7 @@ class ssh (
   $sshd_pubkeyauthentication              = 'yes',
   $sshd_ignoreuserknownhosts              = 'no',
   $sshd_ignorerhosts                      = 'yes',
+  $sshd_config_authenticationmethods      = undef,
   $manage_service                         = true,
   $sshd_addressfamily                     = 'USE_DEFAULTS',
   $service_ensure                         = 'running',
@@ -119,6 +120,7 @@ class ssh (
   $sshd_config_hostcertificate            = undef,
   $sshd_config_trustedusercakeys          = undef,
   $sshd_config_authorized_principals_file = undef,
+  $sshd_config_allowagentforwarding       = undef,
 ) {
 
   case $::osfamily {
@@ -141,7 +143,11 @@ class ssh (
       $default_sshd_gssapicleanupcredentials   = 'yes'
       $default_sshd_acceptenv                  = true
       $default_service_hasstatus               = true
-      $default_sshd_config_serverkeybits       = '1024'
+      if versioncmp($::operatingsystemrelease, '7.4') < 0 {
+        $default_sshd_config_serverkeybits = '1024'
+      } else {
+        $default_sshd_config_serverkeybits = undef
+      }
       $default_sshd_config_hostkey             = [ '/etc/ssh/ssh_host_rsa_key' ]
       $default_sshd_addressfamily              = 'any'
       $default_sshd_config_tcp_keepalive       = 'yes'
@@ -662,7 +668,7 @@ class ssh (
   }
 
   if $sshd_config_maxstartups != undef {
-    validate_re($sshd_config_maxstartups,'^(\d+)+(\d+?:\d+?:\d+)?$',
+    validate_re($sshd_config_maxstartups,'^((\d+)|(\d+?:\d+?:\d+)?)$',
       "ssh::sshd_config_maxstartups may be either an integer or three integers separated with colons, such as 10:30:100. Detected value is <${sshd_config_maxstartups}>.")
   }
 
@@ -697,6 +703,10 @@ class ssh (
 
   if $sshd_pubkeyacceptedkeytypes != undef {
     validate_array($sshd_pubkeyacceptedkeytypes)
+  }
+
+  if $sshd_config_authenticationmethods != undef {
+    validate_array($sshd_config_authenticationmethods)
   }
 
   validate_re($sshd_pubkeyauthentication, '^(yes|no)$', "ssh::sshd_pubkeyauthentication may be either 'yes' or 'no' and is set to <${sshd_pubkeyauthentication}>.")
@@ -893,6 +903,10 @@ class ssh (
 
   if $sshd_config_authorized_principals_file_real != undef {
     validate_string($sshd_config_authorized_principals_file_real)
+  }
+
+  if $sshd_config_allowagentforwarding != undef {
+    validate_re($sshd_config_allowagentforwarding, '^(yes|no)$', "ssh::sshd_config_allowagentforwarding may be either 'yes' or 'no' and is set to <${sshd_config_allowagentforwarding}>.")
   }
 
   if $packages_real != undef {

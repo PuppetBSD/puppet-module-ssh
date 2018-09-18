@@ -3,16 +3,17 @@ require 'spec_helper'
 describe 'ssh' do
 
   default_facts = {
-    :fqdn                => 'monkey.example.com',
-    :hostname            => 'monkey',
-    :ipaddress           => '127.0.0.1',
-    :lsbmajdistrelease   => '6',
-    :osfamily            => 'RedHat',
-    :root_home           => '/root',
-    :specific            => 'dummy',
-    :ssh_version         => 'OpenSSH_6.6p1',
-    :ssh_version_numeric => '6.6',
-    :sshrsakey           => 'AAAAB3NzaC1yc2EAAAABIwAAAQEArGElx46pD6NNnlxVaTbp0ZJMgBKCmbTCT3RaeCk0ZUJtQ8wkcwTtqIXmmiuFsynUT0DFSd8UIodnBOPqitimmooAVAiAi30TtJVzADfPScMiUnBJKZajIBkEMkwUcqsfh630jyBvLPE/kyQcxbEeGtbu1DG3monkeymanOBW1AKc5o+cJLXcInLnbowMG7NXzujT3BRYn/9s5vtT1V9cuZJs4XLRXQ50NluxJI7sVfRPVvQI9EMbTS4AFBXUej3yfgaLSV+nPZC/lmJ2gR4t/tKvMFF9m16f8IcZKK7o0rK7v81G/tREbOT5YhcKLK+0wBfR6RsmHzwy4EddZloyLQ==',
+    :fqdn                   => 'monkey.example.com',
+    :hostname               => 'monkey',
+    :ipaddress              => '127.0.0.1',
+    :lsbmajdistrelease      => '6',
+    :operatingsystemrelease => '6.7',
+    :osfamily               => 'RedHat',
+    :root_home              => '/root',
+    :specific               => 'dummy',
+    :ssh_version            => 'OpenSSH_6.6p1',
+    :ssh_version_numeric    => '6.6',
+    :sshrsakey              => 'AAAAB3NzaC1yc2EAAAABIwAAAQEArGElx46pD6NNnlxVaTbp0ZJMgBKCmbTCT3RaeCk0ZUJtQ8wkcwTtqIXmmiuFsynUT0DFSd8UIodnBOPqitimmooAVAiAi30TtJVzADfPScMiUnBJKZajIBkEMkwUcqsfh630jyBvLPE/kyQcxbEeGtbu1DG3monkeymanOBW1AKc5o+cJLXcInLnbowMG7NXzujT3BRYn/9s5vtT1V9cuZJs4XLRXQ50NluxJI7sVfRPVvQI9EMbTS4AFBXUej3yfgaLSV+nPZC/lmJ2gR4t/tKvMFF9m16f8IcZKK7o0rK7v81G/tREbOT5YhcKLK+0wBfR6RsmHzwy4EddZloyLQ==',
   }
 
   default_solaris_facts = {
@@ -81,6 +82,19 @@ describe 'ssh' do
       :sshd_service_name      => 'sshd',
       :sshd_service_hasstatus => true,
       :sshd_config_fixture    => 'sshd_config_rhel',
+      :ssh_config_fixture     => 'ssh_config_rhel',
+    },
+    'RedHat-7.4' => {
+      :architecture           => 'x86_64',
+      :osfamily               => 'RedHat',
+      :operatingsystemrelease => '7.4',
+      :ssh_version            => 'OpenSSH_6.6p1',
+      :ssh_version_numeric    => '6.6',
+      :ssh_packages           => ['openssh-server', 'openssh-clients'],
+      :sshd_config_mode       => '0600',
+      :sshd_service_name      => 'sshd',
+      :sshd_service_hasstatus => true,
+      :sshd_config_fixture    => 'sshd_config_rhel7',
       :ssh_config_fixture     => 'ssh_config_rhel',
     },
     'Suse-10-x86_64' => {
@@ -419,6 +433,9 @@ describe 'ssh' do
                                                    'ssh-ed25519',
                                                    'ssh-rsa',
         ],
+        :sshd_config_authenticationmethods    => [ 'publickey',
+                                                   'keyboard-interactive',
+        ],
         :sshd_pubkeyauthentication            => 'no',
         :sshd_allow_tcp_forwarding            => 'no',
         :sshd_x11_forwarding                  => 'no',
@@ -470,6 +487,7 @@ describe 'ssh' do
         :sshd_config_tcp_keepalive            => 'yes',
   :sshd_config_use_privilege_separation => 'no',
         :sshd_config_permittunnel             => 'no',
+        :sshd_config_allowagentforwarding     => 'no',
       }
     end
 
@@ -526,6 +544,7 @@ describe 'ssh' do
     it { should contain_file('sshd_config').with_content(/^AuthorizedKeysCommandUser asdf$/) }
     it { should contain_file('sshd_config').with_content(/^HostbasedAuthentication no$/) }
     it { should contain_file('sshd_config').with_content(/^PubkeyAcceptedKeyTypes ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-ed25519,ssh-rsa$/) }
+    it { should contain_file('sshd_config').with_content(/^AuthenticationMethods publickey,keyboard-interactive$/) }
     it { should contain_file('sshd_config').with_content(/^PubkeyAuthentication no$/) }
     it { should contain_file('sshd_config').with_content(/^IgnoreUserKnownHosts no$/) }
     it { should contain_file('sshd_config').with_content(/^IgnoreRhosts yes$/) }
@@ -1266,6 +1285,26 @@ describe 'sshd_config_print_last_log param' do
       expect {
         should contain_class('ssh')
       }.to raise_error(Puppet::Error,/is not an absolute path./)
+    end
+  end
+
+  describe 'with sshd_config_allowagentforwarding' do
+    ['yes','no'].each do |value|
+      context "set to #{value}" do
+        let(:params) { { 'sshd_config_allowagentforwarding' => value } }
+
+        it { should contain_file('sshd_config').with_content(/^AllowAgentForwarding #{value}$/) }
+      end
+    end
+
+    context 'set to invalid value on valid osfamily' do
+      let(:params) { { :sshd_config_allowagentforwarding => 'invalid' } }
+
+      it 'should fail' do
+        expect {
+          should contain_class('ssh')
+        }.to raise_error(Puppet::Error,/ssh::sshd_config_allowagentforwarding may be either \'yes\' or \'no\' and is set to <invalid>\./)
+      end
     end
   end
 
@@ -2392,6 +2431,18 @@ describe 'sshd_config_print_last_log param' do
   [true,'invalid'].each do |pubkeyacceptedkeytypes|
     context "with sshd_pubkeyacceptedkeytypes set to invalid value #{pubkeyacceptedkeytypes}" do
       let(:params) { { :sshd_pubkeyacceptedkeytypes => pubkeyacceptedkeytypes } }
+
+      it 'should fail' do
+        expect {
+          should contain_class('ssh')
+        }.to raise_error(Puppet::Error,/is not/)
+      end
+    end
+  end
+
+  [true,'invalid'].each do |authenticationmethods|
+    context "with sshd_config_authenticationmethods set to invalid value #{authenticationmethods}" do
+      let(:params) { { :sshd_config_authenticationmethods => authenticationmethods } }
 
       it 'should fail' do
         expect {

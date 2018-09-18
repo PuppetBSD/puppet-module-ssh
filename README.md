@@ -6,7 +6,6 @@ Author of the original: https://github.com/ghoneycutt
 
 Fork reason: the lack interest of the author to support FreeBSD OS: https://github.com/ghoneycutt/puppet-module-ssh/pull/180 , waiting for updates.
 
-
 # puppet-module-ssh
 
 Manage ssh client and server.
@@ -32,17 +31,13 @@ Host entries in a personal `~/.ssh/config` file.
 # Compatibility
 
 This module has been tested to work on the following systems with the
-latest Puppet v3, v3 with future parser, last few releases of v4 and
-Puppet v5. See .travis.yml for the exact matrix of supported Puppet and
-ruby versions.
+latest Puppet v3, v3 with future parser, v4 and v5.  See `.travis.yml`
+for the exact matrix of supported Puppet and ruby versions.
 
  * Debian 7
  * EL 5
  * EL 6
  * EL 7
- * FreeBSD 10
- * FreeBSD 11
- * FreeBSD 12
  * SLES 10
  * SLES 11
  * SLES 12
@@ -324,7 +319,7 @@ PrintMotd option in sshd_config.
 
 - *Default*: 'yes'
 
-sshd_config_print_lastlog
+sshd_config_print_last_log
 ----------------------
 PrintLastLog option in sshd_config.
 Verify SSH provides users with feedback on when account accesses last occurred.
@@ -569,9 +564,11 @@ Array of users for the AllowUsers setting in sshd_config.
 
 - *Default*: undef
 
-sshd_config_maxstartups
+sshd_config_maxstartups (string)
 -----------------------
-Specifies the maximum number of concurrent unauthenticated connections to the SSH daemon.
+Specifies the maximum number of concurrent unauthenticated connections
+to the SSH daemon. Must be a stringified integer or a string with three
+integers separated by colons, such as '10:30:100'.
 
 - *Default*: undef
 
@@ -631,6 +628,13 @@ String path (relative or absolute) to the `authorized_principals` file. Sets the
 See `sshd_config(5)` for more details
 
 - *Default*: undefined
+
+sshd_config_allowagentforwarding
+--------------------------------
+AllowAgentForwarding option in sshd_config. Specifies if ssh-agent(1)
+forwarding is permitted. Valid values are 'yes' and 'no'.
+
+- *Default*: undef
 
 config_entries
 --------------
@@ -739,6 +743,12 @@ sshd_ignoreuserknownhosts
 String for IgnoreUserKnownHosts option in sshd_config. Valid values are 'yes' and 'no'. Specifies whether sshd(8) should ignore the user's ~/.ssh/known_hosts during RhostsRSAAuthentication or HostbasedAuthentication.
 
 - *Default*: 'no'
+
+sshd_config_authenticationmethods
+-------------------------
+Array of AuthenticationMethods in sshd_config.
+
+- *Default*: undef
 
 sshd_ignorerhosts
 -------------------------

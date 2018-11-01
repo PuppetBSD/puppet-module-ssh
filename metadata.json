@@ -1,10 +1,10 @@
 {
   "name": "olevole-ssh",
-  "version": "3.57.1",
+  "version": "3.58.0",
   "author": "olevole",
   "summary": "Manages SSH",
   "license": "Apache-2.0",
-  "source": "git@github.com:olevole/puppet-module-ssh.git",
+  "source": "git://github.com/olevole/puppet-module-ssh.git",
   "project_page": "https://github.com/olevole/puppet-module-ssh",
   "issues_url": "https://github.com/olevole/puppet-module-ssh/issues",
   "requirements": [
@@ -82,14 +82,6 @@
         "12.04",
         "14.04",
         "16.04"
-      ]
-    },
-    {
-      "operatingsystem": "FreeBSD",
-      "operatingsystemrelease": [
-        "11",
-        "12",
-        "13"
       ]
     }
   ],
